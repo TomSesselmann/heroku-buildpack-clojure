@@ -13,6 +13,38 @@ cache_copy() {
   fi
 }
 
+# Install yarn
+install_yarn() {
+  local dir="$1"
+  local version=${2:-1.x}
+  local number url code resolve_result
+
+  echo "Resolving yarn version $version..."
+  resolve_result=$(resolve yarn "$version" || echo "failed")
+
+  if [[ "$resolve_result" == "failed" ]]; then
+    fail_bin_install yarn "$version"
+  fi
+
+  read -r number url < <(echo "$resolve_result")
+
+  echo "Downloading and installing yarn ($number)..."
+  code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o /tmp/yarn.tar.gz --write-out "%{http_code}")
+  if [ "$code" != "200" ]; then
+    echo "Unable to download yarn: $code" && false
+  fi
+  rm -rf "$dir"
+  mkdir -p "$dir"
+  # https://github.com/yarnpkg/yarn/issues/770
+  if tar --version | grep -q 'gnu'; then
+    tar xzf /tmp/yarn.tar.gz -C "$dir" --strip 1 --warning=no-unknown-keyword
+  else
+    tar xzf /tmp/yarn.tar.gz -C "$dir" --strip 1
+  fi
+  chmod +x "$dir"/bin/*
+  echo "Installed yarn $(yarn --version)"
+}
+
 # Install node.js
 install_nodejs() {
   local version="${1:?}"
