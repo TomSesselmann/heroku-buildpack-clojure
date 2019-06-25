@@ -84,6 +84,8 @@ install_yarn() {
 
   echo "Downloading and installing yarn ($number)..."
   code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o /tmp/yarn.tar.gz --write-out "%{http_code}")
+  echo "code: $code"
+  echo "url: $url"
   if [ "$code" != "200" ]; then
     echo "Unable to download yarn: $code" && false
   fi
