@@ -13,6 +13,38 @@ cache_copy() {
   fi
 }
 
+RESOLVE="$BP_DIR/vendor/resolve-version-$(get_os)"
+
+resolve() {
+  local binary="$1"
+  local versionRequirement="$2"
+  local n=0
+  local output
+
+  # retry this up to 5 times in case of spurious failed API requests
+  until [ $n -ge 5 ]
+  do
+    # if a user sets the HTTP_PROXY ENV var, it could prevent this from making the S3 requests
+    # it needs here. We can ignore this proxy for aws urls with NO_PROXY
+    # see testAvoidHttpProxyVersionResolutionIssue test
+    if output=$(NO_PROXY="amazonaws.com" $RESOLVE "$binary" "$versionRequirement"); then
+      echo "$output"
+      return 0
+    # don't retry if we get a negative result
+    elif [[ $output = "No result" ]]; then
+      return 1
+    elif [[ $output == "Could not parse"* ]] || [[ $output == "Could not get"* ]]; then
+      return 1
+    else
+      n=$((n+1))
+      # break for a second with a linear backoff
+      sleep $((n+1))
+    fi
+  done
+
+  return 1
+}
+
 # Install yarn
 install_yarn() {
   local dir="$1"
@@ -23,7 +55,25 @@ install_yarn() {
   resolve_result=$(resolve yarn "$version" || echo "failed")
 
   if [[ "$resolve_result" == "failed" ]]; then
-    fail_bin_install yarn "$version"
+    local error
+
+    # Allow the subcommand to fail without trapping the error so we can
+    # get the failing message output
+    set +e
+
+    # re-request the result, saving off the reason for the failure this time
+    error=$($RESOLVE yarn "$version")
+
+    # re-enable trapping
+    set -e
+    
+    if [[ $error = "No result" ]]; then
+      echo "Could not find Yarn version corresponding to version requirement: $version";;
+    elif [[ $error == "Could not parse"* ]] || [[ $error == "Could not get"* ]]; then
+      echo "Error: Invalid semantic version \"$version\""
+    else
+      echo "Error: Unknown error installing \"$version\" of $bin"
+    fi
   fi
 
   read -r number url < <(echo "$resolve_result")
