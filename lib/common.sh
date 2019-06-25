@@ -13,6 +13,10 @@ cache_copy() {
   fi
 }
 
+get_os() {
+  uname | tr '[:upper:]' '[:lower:]'
+}
+
 RESOLVE="$BP_DIR/vendor/resolve-version-$(get_os)"
 
 resolve() {
