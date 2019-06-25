@@ -72,7 +72,7 @@ install_yarn() {
     set -e
     
     if [[ $error = "No result" ]]; then
-      echo "Could not find Yarn version corresponding to version requirement: $version";;
+      echo "Could not find Yarn version corresponding to version requirement: $version"
     elif [[ $error == "Could not parse"* ]] || [[ $error == "Could not get"* ]]; then
       echo "Error: Invalid semantic version \"$version\""
     else
