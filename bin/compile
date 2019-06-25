@@ -29,7 +29,7 @@ detect_and_install_nodejs ${BUILD_DIR}
 
 # Download and install yarn if there is a yarn.lock file.
 if $YARN; then
-  install_yarn "$BUILD_DIR/.heroku/yarn"
+  install_yarn ${BUILD_DIR}
 fi
 
 # install rlwrap binary, always needed for clj command, and also on old lein 1.x
