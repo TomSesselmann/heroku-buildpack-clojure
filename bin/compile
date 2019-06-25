@@ -27,11 +27,9 @@ install_jdk ${BUILD_DIR}
 # Install Node.js if needed
 detect_and_install_nodejs ${BUILD_DIR}
 
-# Download yarn if there is a yarn.lock file or if the user
-# has specified a version of yarn under "engines". We'll still
-# only install using yarn if there is a yarn.lock file
-if $YARN || [ -n "$yarn_engine" ]; then
-  install_yarn "$BUILD_DIR/.heroku/yarn" "$yarn_engine"
+# Download and install yarn if there is a yarn.lock file.
+if $YARN then
+  install_yarn "$BUILD_DIR/.heroku/yarn"
 fi
 
 # install rlwrap binary, always needed for clj command, and also on old lein 1.x

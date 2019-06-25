@@ -52,7 +52,7 @@ resolve() {
 # Install yarn
 install_yarn() {
   local dir="$1"
-  local version=${2:-1.x}
+  local version="1.x"
   local number url code resolve_result
 
   echo "Resolving yarn version $version..."
@@ -76,7 +76,7 @@ install_yarn() {
     elif [[ $error == "Could not parse"* ]] || [[ $error == "Could not get"* ]]; then
       echo "Error: Invalid semantic version \"$version\""
     else
-      echo "Error: Unknown error installing \"$version\" of yarn
+      echo "Error: Unknown error installing \"$version\" of yarn"
     fi
   fi
 
