@@ -28,7 +28,7 @@ install_jdk ${BUILD_DIR}
 detect_and_install_nodejs ${BUILD_DIR}
 
 # Download and install yarn if there is a yarn.lock file.
-if $YARN then
+if $YARN; then
   install_yarn "$BUILD_DIR/.heroku/yarn"
 fi
 
