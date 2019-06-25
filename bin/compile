@@ -28,9 +28,7 @@ install_jdk ${BUILD_DIR}
 detect_and_install_nodejs ${BUILD_DIR}
 
 # Download and install yarn if there is a yarn.lock file.
-if $YARN; then
-  install_yarn ${BUILD_DIR}
-fi
+detect_and_install_yarn ${BUILD_DIR}
 
 # install rlwrap binary, always needed for clj command, and also on old lein 1.x
 install_rlwrap "${BUILD_DIR}" "${CACHE_DIR}"

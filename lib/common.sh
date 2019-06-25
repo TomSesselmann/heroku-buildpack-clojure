@@ -51,8 +51,8 @@ resolve() {
 
 # Install yarn
 install_yarn() {
-  local dir="$1"
-  local version="1.x"
+  local version="${1:?}"
+  local dir="${2:?}"
   local number url code resolve_result
 
   echo "Resolving yarn version $version..."
@@ -97,6 +97,16 @@ install_yarn() {
   fi
   chmod +x "$dir"/bin/*
   echo "Installed yarn $(yarn --version)"
+}
+
+detect_and_install_yarn() {
+  local buildDir=${1}
+  if $YARN; then
+    yarnVersion="1.x"
+    echo "-----> Installing yarn ${yarnVersion}..."
+    install_yarn ${yarnVersion} ${buildDir}/.heroku/yarn 2>&1 | sed -u 's/^/       /'
+    export PATH=${buildDir}/.heroku/yarn/bin:$PATH
+  fi
 }
 
 # Install node.js
